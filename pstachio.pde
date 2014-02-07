@@ -54,15 +54,15 @@ PFont aller;
 PFont allerbold;
 
 String[] rewardPhrases = {
-    "You get a\n05% off today!", 
-    "You get a\n10% off today!", 
-    "You get a\n20% off today!"
-  };
+  "You get a\n05% off today!", 
+  "You get a\n10% off today!", 
+  "You get a\n20% off today!"
+};
 
 
 void setup() {
   size(1024, 768);
-    setupFonts();
+  setupFonts();
 
 
   currentUser = "unknown-user";
@@ -97,8 +97,8 @@ void setUpRec() {
 
   // Create the face recognizer object
   rekog = new Rekognition(this, api_key, api_secret);
-  rekog.setNamespace("stachio");
-  rekog.setUserID("processing");
+  rekog.setNamespace("pstachio");
+  rekog.setUserID("demo");
   println("in setUpRec");
 }
 
@@ -120,12 +120,19 @@ void showMatches() {
     // A string (name of face) is paired with a float from 0 to 1 (how likely is it that face)
     FloatDict matches = faces[i].getMatches();
 
-    if (matches.maxValue() > confidenceThresh) {
-      saluteUser(matches.maxKey(), matches.maxValue());
-    }
-    else {
-      showMatches = false;
-      getUserInfo = true;
+    if (matches.size() > 0) {
+      println("we have matches...");
+    
+
+      if (matches.maxValue() > confidenceThresh) {
+        saluteUser(matches.maxKey(), matches.maxValue());
+      }
+      else {
+        showMatches = false;
+        getUserInfo = true;
+      }
+    }else{
+      println("no matches found");
     }
   }
 }
@@ -133,22 +140,23 @@ void showMatches() {
 void getUserInfo() {
   if (userInfoCounter == 0) text("we don't seem to recognize you! \n  stach to create a new account", 200, 200);
   else if (userInfoCounter == 1)  text("Enter your name: /n" + typedText, 200, 200);
-  else if (userInfoCounter == 2)  { 
+  else if (userInfoCounter == 2) { 
     text("Is your name " + typedText + "?", 200, 200);
-    if(keyPressed && key != ENTER) userInfoCounter--;
+    if (keyPressed && key != ENTER) userInfoCounter--;
   }
   else if (userInfoCounter == 3) {
     userInfoCounter++;
     text("Creating account...", 200, 200);
-    trainFace();   
-  }else if(userInfoCounter == 4) {
+    trainFace();
+  }
+  else if (userInfoCounter == 4) {
     text("account successfully created!", 200, 200);
   }
 }
 
 void trainFace() {
-    rekog.addFace(fileName, typedText);
-    rekog.train();
+  rekog.addFace(fileName, typedText);
+  rekog.train();
 }
 
 //--- MAIN PROGRAM LOGIC ---//
@@ -233,9 +241,9 @@ void mainPage() {
 //--- MOUSE AND KEYBOARD INPUT --//
 
 void keyPressed() {
-  
- println("userInfoCounter: " + userInfoCounter + "  appState: " + appState);
-  
+
+  println("userInfoCounter: " + userInfoCounter + "  appState: " + appState);
+
   switch(key) {
   case 's':  
     currentStach = (currentStach + 1)%stachCount;
@@ -269,7 +277,8 @@ void keyReleased() {
       case TAB:
         typedText += "    ";
         break;
-      case ENTER:    userInfoCounter++;
+      case ENTER:    
+        userInfoCounter++;
       case RETURN:
         // comment out the following two lines to disable line-breaks
         typedText += "\n";
